@@ -120,11 +120,11 @@
     .hero {
       max-width: var(--max-w);
       margin-inline: auto;
-      padding: var(--space-xl) var(--space-md);
-      display: flex;
-      flex-direction: column;
+      padding: var(--space-2xl) var(--space-md) var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
       align-items: center;
-      text-align: center;
     }
     .hero-text h1 {
       font-family: var(--font-display);
@@ -178,11 +178,15 @@
     .btn-secondary:hover { border-color: var(--stone-500); color: var(--stone-900); text-decoration: none; }
 
     .hero-visual {
-      margin-block-end: var(--space-lg);
+      display: flex;
+      justify-content: center;
     }
     .hero-visual img {
       width: 100%;
-      max-inline-size: 640px;
+      max-inline-size: 520px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: 30% center;
       border-radius: 12px;
       box-shadow: 0 24px 48px oklch(0 0 0 / 0.08), 0 4px 12px oklch(0 0 0 / 0.04);
     }
@@ -392,7 +396,11 @@
 
     /* --- RESPONSIVE --- */
     @media (max-width: 768px) {
-      .hero { padding: var(--space-lg) var(--space-md); }
+      .hero {
+        grid-template-columns: 1fr;
+        padding: var(--space-xl) var(--space-md) var(--space-lg);
+      }
+      .hero-visual { order: -1; }
       .hero-visual img { max-inline-size: 100%; }
       .comparison { grid-template-columns: 1fr; }
       nav .links { gap: var(--space-sm); }
@@ -417,9 +425,6 @@
 </nav>
 
 <div class="hero">
-  <div class="hero-visual">
-    <img src="logo.jpg" alt="Redan - a V-shaped fortification protecting a mountain pass">
-  </div>
   <div class="hero-text">
     <h1>Your agents run free.<br><em>Your secrets stay put.</em></h1>
     <p>
@@ -434,6 +439,9 @@
         Source code
       </a>
     </div>
+  </div>
+  <div class="hero-visual">
+    <img src="logo.jpg" alt="Redan - a V-shaped fortification protecting a mountain pass">
   </div>
 </div>
 
