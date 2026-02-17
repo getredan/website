@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redan — Secure agent execution</title>
+  <title>Redan - Secure agent execution</title>
   <meta name="description" content="Run AI coding agents inside microVMs with network-layer secret injection. Your agents run free. Your secrets stay put.">
-  <meta property="og:title" content="Redan — Secure agent execution">
+  <meta property="og:title" content="Redan - Secure agent execution">
   <meta property="og:description" content="Run AI coding agents inside microVMs with network-layer secret injection.">
   <meta property="og:image" content="https://redan.dev/logo.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -424,14 +424,14 @@
     </div>
   </div>
   <div class="hero-visual">
-    <img src="logo.jpg" alt="Redan — a V-shaped fortification protecting a mountain pass">
+    <img src="logo.jpg" alt="Redan - a V-shaped fortification protecting a mountain pass">
   </div>
 </div>
 
 <div class="install-bar">
   <div class="inner">
     <span class="label">Install</span>
-    <code>curl -L https://github.com/getredan/redan/releases/latest/download/redan-0.2.0-alpha-linux-x86_64.tar.gz | tar xz</code>
+    <code>curl -L https://github.com/getredan/redan/releases/download/v0.2.0-alpha/redan-v0.2.0-alpha-linux-x86_64.tar.gz | tar xz</code>
   </div>
 </div>
 
@@ -439,15 +439,17 @@
   <h2>Why redan?</h2>
   <p class="subtitle">
     AI agents need API keys to be useful and sandboxes to be safe.
-    The gap between "no network" and "trust the agent" is where redan sits.
+    Some agents ship built-in sandboxing, but each one does it differently.
+    Redan provides a single, hardened execution layer that works with any agent:
+    Claude Code, Pi, OpenCode, or whatever comes next.
   </p>
 
   <div class="comparison">
     <div class="comparison-card bad">
-      <h3>Without redan</h3>
+      <h3>Typical setup</h3>
       <ul>
         <li>Agent sees your API keys in plain text</li>
-        <li>A prompt injection exfiltrates credentials</li>
+        <li>Each agent has its own sandbox (or none at all)</li>
         <li>No control over which hosts the agent contacts</li>
         <li>Secrets end up in logs, error messages, LLM context</li>
       </ul>
@@ -456,7 +458,7 @@
       <h3>With redan</h3>
       <ul>
         <li>Agent sees placeholder tokens, never real secrets</li>
-        <li>Secrets injected at the network layer, per-host</li>
+        <li>One runtime for all agents, consistent policy</li>
         <li>Default-deny networking with explicit allowlist</li>
         <li>Responses scrubbed before the agent sees them</li>
       </ul>
@@ -479,7 +481,7 @@
     <div class="feature-card">
       <div class="feature-icon">🔑</div>
       <h3>Secret injection</h3>
-      <p>Secrets are injected into HTTP headers by the proxy. The guest never sees real values — only placeholders.</p>
+      <p>Secrets are injected into HTTP headers by the proxy. The guest never sees real values, only placeholders.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon">🌐</div>
@@ -574,8 +576,8 @@ source = <span class="string">"."</span></pre>
     providers (including Vault), and all security logic ship in the open core.
   </p>
   <p style="color: var(--stone-600); max-width: 600px;">
-    This is alpha software. It works end-to-end — from <code>redan init</code>
-    through interactive Claude Code sessions with network policy enforcement —
+    This is alpha software. It works end-to-end, from <code>redan init</code>
+    through interactive Claude Code sessions with network policy enforcement,
     but has not been through an independent security audit.
     <a href="https://github.com/getredan/redan/blob/main/docs/security-model.md">Read the security model</a>.
   </p>
@@ -588,7 +590,7 @@ source = <span class="string">"."</span></pre>
     <a href="https://github.com/getredan/redan/blob/main/docs/security-model.md">Security</a>
     <a href="https://buymeacoffee.com/cgrebs">Support</a>
   </div>
-  <p>BSD-3-Clause · Built by <a href="https://github.com/EnTeQuAk">Chris Grebs</a></p>
+  <p>BSD-3-Clause · Built by <a href="https://github.com/EnTeQuAk">Christopher Grebs</a></p>
 </footer>
 
 </body>
