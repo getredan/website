@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redan — Secure agent execution</title>
+  <meta name="description" content="Run AI coding agents inside microVMs with network-layer secret injection. Your agents run free. Your secrets stay put.">
+  <meta property="og:title" content="Redan — Secure agent execution">
+  <meta property="og:description" content="Run AI coding agents inside microVMs with network-layer secret injection.">
+  <meta property="og:image" content="https://redan.dev/logo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --stone-50: #fafaf9;
+      --stone-100: #f5f5f4;
+      --stone-200: #e7e5e4;
+      --stone-300: #d6d3d1;
+      --stone-400: #a8a29e;
+      --stone-500: #78716c;
+      --stone-600: #57534e;
+      --stone-700: #44403c;
+      --stone-800: #292524;
+      --stone-900: #1c1917;
+      --warm-accent: #c2956a;
+      --warm-accent-light: #d4ad85;
+      --slate-blue: #64748b;
+      --green-ok: #4ade80;
+      --red-block: #f87171;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      --max-width: 1120px;
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 1.5rem;
+      --space-lg: 3rem;
+      --space-xl: 5rem;
+      --space-2xl: 8rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--stone-800);
+      background: var(--stone-50);
+      line-height: 1.7;
+    }
+
+    a { color: var(--warm-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* --- NAV --- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250, 250, 249, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--stone-200);
+      padding: var(--space-sm) 0;
+    }
+    nav .inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    nav .brand {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--stone-900);
+      letter-spacing: -0.02em;
+    }
+    nav .links {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    nav .links a { color: var(--stone-600); }
+    nav .links a:hover { color: var(--stone-900); text-decoration: none; }
+    nav .gh-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--stone-900);
+      color: var(--stone-50) !important;
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+    nav .gh-link:hover { background: var(--stone-700); text-decoration: none; }
+
+    /* --- HERO --- */
+    .hero {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--space-2xl) var(--space-md) var(--space-xl);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      line-height: 1.15;
+      color: var(--stone-900);
+      margin-bottom: var(--space-md);
+    }
+    .hero-text h1 em {
+      font-style: normal;
+      color: var(--warm-accent);
+    }
+    .hero-text p {
+      font-size: 1.15rem;
+      color: var(--stone-600);
+      max-width: 480px;
+      margin-bottom: var(--space-lg);
+    }
+    .hero-actions {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--stone-900);
+      color: var(--stone-50);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--stone-700); text-decoration: none; }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--stone-700);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: 1.5px solid var(--stone-300);
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--stone-500); color: var(--stone-900); text-decoration: none; }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+    }
+    .hero-visual img {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 12px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    /* --- INSTALL BAR --- */
+    .install-bar {
+      background: var(--stone-900);
+      color: var(--stone-300);
+      padding: var(--space-md) 0;
+    }
+    .install-bar .inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    .install-bar code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      color: var(--stone-100);
+      user-select: all;
+    }
+    .install-bar .label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--stone-400);
+    }
+
+    /* --- SECTIONS --- */
+    section {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+    }
+    section h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      color: var(--stone-900);
+      margin-bottom: var(--space-sm);
+    }
+    section .subtitle {
+      color: var(--stone-500);
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin-bottom: var(--space-lg);
+    }
+
+    /* --- FEATURES GRID --- */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-md);
+    }
+    .feature-card {
+      padding: var(--space-md);
+      border: 1px solid var(--stone-200);
+      border-radius: 10px;
+      background: white;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--warm-accent-light);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--stone-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-sm);
+      font-size: 1.1rem;
+    }
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+      color: var(--stone-900);
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: var(--stone-600);
+      line-height: 1.6;
+    }
+
+    /* --- DIAGRAM --- */
+    .diagram-section {
+      background: var(--stone-900);
+      color: var(--stone-200);
+      margin: 0;
+      max-width: none;
+      padding: var(--space-xl) var(--space-md);
+    }
+    .diagram-section .inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+    .diagram-section h2 { color: var(--stone-100); }
+    .diagram-section .subtitle { color: var(--stone-400); }
+    .diagram-pre {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--stone-300);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: var(--space-md);
+      overflow-x: auto;
+    }
+    .diagram-pre .hi { color: var(--warm-accent-light); }
+    .diagram-pre .ok { color: var(--green-ok); }
+    .diagram-pre .no { color: var(--red-block); }
+
+    /* --- CODE BLOCK --- */
+    .code-section { padding-top: var(--space-lg); }
+    .code-block {
+      background: var(--stone-900);
+      border-radius: 10px;
+      padding: var(--space-md);
+      overflow-x: auto;
+      margin-top: var(--space-md);
+    }
+    .code-block pre {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--stone-300);
+    }
+    .code-block .comment { color: var(--stone-500); }
+    .code-block .string { color: var(--warm-accent-light); }
+    .code-block .flag { color: var(--slate-blue); }
+    .code-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--stone-400);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* --- COMPARISON --- */
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
+    .comparison-card {
+      padding: var(--space-md);
+      border-radius: 10px;
+      border: 1px solid var(--stone-200);
+    }
+    .comparison-card.bad { border-color: var(--red-block); background: #fef2f2; }
+    .comparison-card.good { border-color: var(--green-ok); background: #f0fdf4; }
+    .comparison-card h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-sm);
+    }
+    .comparison-card.bad h3 { color: #dc2626; }
+    .comparison-card.good h3 { color: #16a34a; }
+    .comparison-card ul {
+      list-style: none;
+      font-size: 0.9rem;
+      color: var(--stone-700);
+    }
+    .comparison-card li {
+      padding: 0.3rem 0;
+      padding-left: 1.4rem;
+      position: relative;
+    }
+    .comparison-card li::before {
+      position: absolute;
+      left: 0;
+      font-weight: 600;
+    }
+    .comparison-card.bad li::before { content: '✕'; color: #dc2626; }
+    .comparison-card.good li::before { content: '✓'; color: #16a34a; }
+
+    /* --- FOOTER --- */
+    footer {
+      border-top: 1px solid var(--stone-200);
+      padding: var(--space-lg) var(--space-md);
+      text-align: center;
+      color: var(--stone-500);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--stone-600); }
+    footer .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; padding: var(--space-xl) var(--space-md) var(--space-lg); }
+      .hero-visual { order: -1; }
+      .hero-visual img { max-width: 100%; }
+      .comparison { grid-template-columns: 1fr; }
+      nav .links { gap: var(--space-sm); }
+      .install-bar .inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="/" class="brand">redan</a>
+    <div class="links">
+      <a href="https://github.com/getredan/redan#installation">Install</a>
+      <a href="https://github.com/getredan/redan/blob/main/docs/security-model.md">Security</a>
+      <a href="https://github.com/getredan/redan" class="gh-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-text">
+    <h1>Your agents run free.<br><em>Your secrets stay put.</em></h1>
+    <p>
+      Redan runs AI coding agents inside microVMs with network-layer
+      secret injection. Agents get a real dev environment but never see
+      your credentials.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/getredan/redan#installation" class="btn-primary">Get started</a>
+      <a href="https://github.com/getredan/redan" class="btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Source code
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="logo.jpg" alt="Redan — a V-shaped fortification protecting a mountain pass">
+  </div>
+</div>
+
+<div class="install-bar">
+  <div class="inner">
+    <span class="label">Install</span>
+    <code>curl -L https://github.com/getredan/redan/releases/latest/download/redan-0.2.0-alpha-linux-x86_64.tar.gz | tar xz</code>
+  </div>
+</div>
+
+<section>
+  <h2>Why redan?</h2>
+  <p class="subtitle">
+    AI agents need API keys to be useful and sandboxes to be safe.
+    The gap between "no network" and "trust the agent" is where redan sits.
+  </p>
+
+  <div class="comparison">
+    <div class="comparison-card bad">
+      <h3>Without redan</h3>
+      <ul>
+        <li>Agent sees your API keys in plain text</li>
+        <li>A prompt injection exfiltrates credentials</li>
+        <li>No control over which hosts the agent contacts</li>
+        <li>Secrets end up in logs, error messages, LLM context</li>
+      </ul>
+    </div>
+    <div class="comparison-card good">
+      <h3>With redan</h3>
+      <ul>
+        <li>Agent sees placeholder tokens, never real secrets</li>
+        <li>Secrets injected at the network layer, per-host</li>
+        <li>Default-deny networking with explicit allowlist</li>
+        <li>Responses scrubbed before the agent sees them</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <p class="subtitle">
+    A microVM boots in under a second. All network traffic routes through
+    a TLS MITM proxy on the host that injects and scrubs secrets.
+  </p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>VM isolation</h3>
+      <p>Each session runs in a libkrun microVM with its own kernel. No shared filesystem, no shared memory with the host.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔑</div>
+      <h3>Secret injection</h3>
+      <p>Secrets are injected into HTTP headers by the proxy. The guest never sees real values — only placeholders.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>Default-deny network</h3>
+      <p>No outbound connections unless you allow them. Wildcard patterns, private IP blocking, domain fronting protection.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📋</div>
+      <h3>Audit trail</h3>
+      <p>Every connection, injection, and scrub event is logged. Structured JSON-lines for compliance and debugging.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <h3>Discover mode</h3>
+      <p>Don't know what hosts your agent needs? Run once with <code>--discover</code> and redan prints a suggested allowlist.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Fast boot</h3>
+      <p>Sub-second VM startup via libkrun. No daemon, no background service. Single binary, runs inline.</p>
+    </div>
+  </div>
+</section>
+
+<div class="diagram-section">
+  <div class="inner">
+    <h2>Architecture</h2>
+    <p class="subtitle">Everything between the agent and the internet is controlled by redan.</p>
+    <pre class="diagram-pre">
+<span class="hi">Guest VM</span> (libkrun, &lt;1s boot)
+  │
+  │  virtio-fs  (project dir, read-write)
+  │  virtio-net (ethernet over unix socket)
+  ▼
+<span class="hi">smoltcp</span> (userspace TCP/IP on host)
+  │
+  ├── UDP :53   → synthetic DNS (no queries leave the host)
+  ├── TCP :80   → <span class="no">rejected</span> (HTTPS only)
+  └── TCP :443  → TLS MITM proxy
+        │
+        ├── SNI extraction
+        ├── ephemeral cert (per-session CA)
+        ├── <span class="ok">secret injection</span> (headers only, host-allowlisted)
+        ├── request forwarded to real upstream
+        ├── <span class="ok">response scrubbed</span> of secret values
+        └── streamed back to guest</pre>
+  </div>
+</div>
+
+<section class="code-section">
+  <h2>Get started in 3 commands</h2>
+  <p class="subtitle">Works with Claude Code out of the box. Bring your own agent too.</p>
+
+  <p class="code-label">Terminal</p>
+  <div class="code-block">
+    <pre><span class="comment"># Generate config and devcontainer</span>
+redan init <span class="flag">--claude</span>
+
+<span class="comment"># Build the image</span>
+redan image import myproject <span class="flag">--devcontainer</span> <span class="string">.devcontainer/redan</span>
+
+<span class="comment"># Run the agent</span>
+redan exec</pre>
+  </div>
+
+  <p style="margin-top: var(--space-md);">
+    Or configure manually with a <code>redan.toml</code>:
+  </p>
+
+  <p class="code-label" style="margin-top: var(--space-md);">redan.toml</p>
+  <div class="code-block">
+    <pre><span class="comment"># Already have a Dockerfile?</span>
+image = <span class="string">"claude-code"</span>
+interactive = <span class="string">true</span>
+
+[network]
+allow = [<span class="string">"api.anthropic.com"</span>, <span class="string">"*.npmjs.org"</span>]
+
+[secrets.ANTHROPIC_API_KEY]
+value = <span class="string">"sk-ant-..."</span>
+hosts = [<span class="string">"api.anthropic.com"</span>]
+
+[mount.workspace]
+source = <span class="string">"."</span></pre>
+  </div>
+</section>
+
+<section>
+  <h2>Open source</h2>
+  <p class="subtitle">
+    Redan is BSD-3-Clause licensed. The full proxy, VM lifecycle, secret
+    providers (including Vault), and all security logic ship in the open core.
+  </p>
+  <p style="color: var(--stone-600); max-width: 600px;">
+    This is alpha software. It works end-to-end — from <code>redan init</code>
+    through interactive Claude Code sessions with network policy enforcement —
+    but has not been through an independent security audit.
+    <a href="https://github.com/getredan/redan/blob/main/docs/security-model.md">Read the security model</a>.
+  </p>
+</section>
+
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/getredan/redan">GitHub</a>
+    <a href="https://github.com/getredan/redan/releases">Releases</a>
+    <a href="https://github.com/getredan/redan/blob/main/docs/security-model.md">Security</a>
+    <a href="https://buymeacoffee.com/cgrebs">Support</a>
+  </div>
+  <p>BSD-3-Clause · Built by <a href="https://github.com/EnTeQuAk">Chris Grebs</a></p>
+</footer>
+
+</body>
+</html>
