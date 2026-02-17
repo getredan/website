@@ -120,11 +120,11 @@
     .hero {
       max-width: var(--max-w);
       margin-inline: auto;
-      padding: var(--space-2xl) var(--space-md) var(--space-xl);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-xl);
+      padding: var(--space-xl) var(--space-md);
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      text-align: center;
     }
     .hero-text h1 {
       font-family: var(--font-display);
@@ -132,6 +132,7 @@
       line-height: 1.15;
       color: var(--stone-900);
       margin-block-end: var(--space-md);
+      text-wrap: balance;
     }
     .hero-text h1 em {
       font-style: normal;
@@ -140,7 +141,7 @@
     .hero-text p {
       font-size: 1.15rem;
       color: var(--stone-600);
-      max-inline-size: 30rem;
+      max-inline-size: 38rem;
       margin-block-end: var(--space-lg);
     }
     .hero-actions {
@@ -177,12 +178,11 @@
     .btn-secondary:hover { border-color: var(--stone-500); color: var(--stone-900); text-decoration: none; }
 
     .hero-visual {
-      display: flex;
-      justify-content: center;
+      margin-block-end: var(--space-lg);
     }
     .hero-visual img {
       width: 100%;
-      max-inline-size: 520px;
+      max-inline-size: 640px;
       border-radius: 12px;
       box-shadow: 0 24px 48px oklch(0 0 0 / 0.08), 0 4px 12px oklch(0 0 0 / 0.04);
     }
@@ -392,11 +392,7 @@
 
     /* --- RESPONSIVE --- */
     @media (max-width: 768px) {
-      .hero {
-        grid-template-columns: 1fr;
-        padding: var(--space-xl) var(--space-md) var(--space-lg);
-      }
-      .hero-visual { order: -1; }
+      .hero { padding: var(--space-lg) var(--space-md); }
       .hero-visual img { max-inline-size: 100%; }
       .comparison { grid-template-columns: 1fr; }
       nav .links { gap: var(--space-sm); }
@@ -421,6 +417,9 @@
 </nav>
 
 <div class="hero">
+  <div class="hero-visual">
+    <img src="logo.jpg" alt="Redan - a V-shaped fortification protecting a mountain pass">
+  </div>
   <div class="hero-text">
     <h1>Your agents run free.<br><em>Your secrets stay put.</em></h1>
     <p>
@@ -435,9 +434,6 @@
         Source code
       </a>
     </div>
-  </div>
-  <div class="hero-visual">
-    <img src="logo.jpg" alt="Redan - a V-shaped fortification protecting a mountain pass">
   </div>
 </div>
 
